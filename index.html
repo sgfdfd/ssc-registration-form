@@ -1,94 +1,704 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Registration Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-
-<body style="font-family: Arial; padding:20px;">
-
-<h2>Registration Form</h2>
-
-<form id="regForm">
-
-  <input id="name" placeholder="Full Name" required><br><br>
-  <input id="school" placeholder="School Name" required><br><br>
-  <input id="mobile" placeholder="Mobile (01XXXXXXXXX)" required><br><br>
-  <input id="email" placeholder="Email" required><br><br>
-
-  <select id="board" required>
-    <option value="">Select Board</option>
-    <option value="dhaka">Dhaka</option>
-    <option value="rajshahi">Rajshahi</option>
-  </select><br><br>
-
-  <input id="district" placeholder="District" required><br><br>
-
-  <input id="paymentNumber" placeholder="Payment Number" required><br><br>
-  <input id="transactionId" placeholder="Transaction ID" required><br><br>
-
-  <button type="button" onclick="submitForm()">Submit</button>
-
-</form>
-
-<p id="msg"></p>
-
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbzMPU6thUFOh9BiGo_hLwxzANOqbB4cqxo8RdkrXVjgPum9RHtX6ecG1dCXtX8qRiQTuA/exec";
-
-function submitForm() {
-
-  const data = {
-    name: document.getElementById("name").value.trim(),
-    school: document.getElementById("school").value.trim(),
-    mobile: document.getElementById("mobile").value.trim(),
-    email: document.getElementById("email").value.trim(),
-    board: document.getElementById("board").value,
-    district: document.getElementById("district").value.trim(),
-    paymentNumber: document.getElementById("paymentNumber").value.trim(),
-    transactionId: document.getElementById("transactionId").value.trim()
-  };
-
-  // simple validation
-  for (let key in data) {
-    if (!data[key]) {
-      document.getElementById("msg").innerText = "সব ফিল্ড পূরণ করুন";
-      return;
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-  }
 
-  document.getElementById("msg").innerText = "Submitting...";
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #070b1e;
+      overflow-x: hidden;
+      padding: 24px 16px;
+      position: relative;
+    }
 
-  fetch(API_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "text/plain;charset=utf-8"
-    },
-    body: JSON.stringify(data)
-  })
-  .then(res => res.text())
-  .then(res => {
-    try {
-      const result = JSON.parse(res);
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
 
-      if (result.status === "success") {
-        document.getElementById("msg").innerText = "✅ Registration Successful";
-        document.getElementById("regForm").reset();
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.55;
+      animation: blobFloat 20s ease-in-out infinite;
+    }
+
+    .blob-1 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, #4f6cff, #7c3aed);
+      top: -12%; left: -8%;
+      animation-duration: 24s;
+    }
+
+    .blob-2 {
+      width: 440px; height: 440px;
+      background: radial-gradient(circle, #c084fc, #f472b6);
+      bottom: -12%; right: -6%;
+      animation-delay: -6s;
+      animation-duration: 20s;
+    }
+
+    .blob-3 {
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, #38bdf8, #3b82f6);
+      top: 45%; left: 55%;
+      animation-delay: -12s;
+      animation-duration: 26s;
+    }
+
+    .blob-4 {
+      width: 260px; height: 260px;
+      background: radial-gradient(circle, #34d399, #06b6d4);
+      top: 15%; right: 18%;
+      animation-delay: -4s;
+      animation-duration: 22s;
+    }
+
+    .blob-5 {
+      width: 220px; height: 220px;
+      background: radial-gradient(circle, #fb923c, #f43f5e);
+      bottom: 18%; left: 12%;
+      animation-delay: -9s;
+      animation-duration: 28s;
+    }
+
+    @keyframes blobFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(50px, -35px) scale(1.08); }
+      50% { transform: translate(-25px, 55px) scale(0.94); }
+      75% { transform: translate(35px, 25px) scale(1.05); }
+    }
+
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+    }
+
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .particle {
+      position: absolute;
+      background: rgba(255,255,255,0.25);
+      border-radius: 50%;
+      animation: drift linear infinite;
+    }
+
+    @keyframes drift {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      8% { opacity: 1; }
+      92% { opacity: 1; }
+      100% { transform: translateY(-8vh) translateX(25px); opacity: 0; }
+    }
+
+    .glass-card {
+      position: relative;
+      z-index: 10;
+      width: 440px;
+      max-width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(44px);
+      -webkit-backdrop-filter: blur(44px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 28px;
+      padding: 40px 34px 34px;
+      box-shadow:
+        0 8px 40px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        inset 0 -1px 0 rgba(0,0,0,0.15);
+      animation: cardIn 0.9s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .glass-card::-webkit-scrollbar { width: 3px; }
+    .glass-card::-webkit-scrollbar-track { background: transparent; }
+    .glass-card::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.12);
+      border-radius: 4px;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(50px) scale(0.95); filter: blur(12px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    .form-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header-icon {
+      width: 56px; height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #4f6cff, #7c3aed);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 24px rgba(79,108,255,0.45);
+      animation: iconPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes iconPulse {
+      0%, 100% { box-shadow: 0 6px 24px rgba(79,108,255,0.45); }
+      50% { box-shadow: 0 6px 36px rgba(79,108,255,0.65); }
+    }
+
+    .header-icon svg {
+      width: 26px; height: 26px;
+      stroke: #fff; fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .form-header h2 {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 5px;
+    }
+
+    .form-header p {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    .field {
+      margin-bottom: 16px;
+      animation: fieldIn 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .field:nth-child(1)  { animation-delay: 0.08s; }
+    .field:nth-child(2)  { animation-delay: 0.13s; }
+    .field:nth-child(3)  { animation-delay: 0.18s; }
+    .field:nth-child(4)  { animation-delay: 0.23s; }
+    .field:nth-child(5)  { animation-delay: 0.28s; }
+    .field:nth-child(6)  { animation-delay: 0.33s; }
+    .field:nth-child(7)  { animation-delay: 0.38s; }
+    .field:nth-child(8)  { animation-delay: 0.43s; }
+    .field:nth-child(9)  { animation-delay: 0.48s; }
+    .field:nth-child(10) { animation-delay: 0.53s; }
+    .field:nth-child(11) { animation-delay: 0.58s; }
+
+    @keyframes fieldIn {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .field-label {
+      display: block;
+      color: rgba(255,255,255,0.45);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+
+    .field-wrap {
+      position: relative;
+    }
+
+    .field-wrap .ico {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px; height: 17px;
+      stroke: rgba(255,255,255,0.22);
+      fill: none;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      pointer-events: none;
+      transition: stroke 0.3s;
+      z-index: 2;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px 14px 12px 44px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 400;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    select {
+      cursor: pointer;
+      padding-right: 38px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 5 5 5-5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+    }
+
+    input::placeholder {
+      color: rgba(255,255,255,0.18);
+    }
+
+    select option {
+      background: #151a3a;
+      color: #fff;
+    }
+
+    input:hover, select:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.1);
+    }
+
+    input:focus, select:focus {
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(79,108,255,0.5);
+      box-shadow: 0 0 0 3px rgba(79,108,255,0.1), 0 0 24px rgba(79,108,255,0.06);
+    }
+
+    input:focus ~ .ico,
+    select:focus ~ .ico {
+      stroke: rgba(99,140,255,0.7);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 22px 0 18px;
+      animation: fieldIn 0.6s 0.4s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.06);
+    }
+
+    .divider span {
+      color: rgba(255,255,255,0.25);
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    select:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px 24px;
+      background: linear-gradient(135deg, #4f6cff 0%, #7c3aed 50%, #a855f7 100%);
+      background-size: 200% 200%;
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: 0.015em;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      margin-top: 6px;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 0 4px 24px rgba(79,108,255,0.35);
+      animation: fieldIn 0.6s 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.18), transparent);
+      transform: translateX(-110%);
+      transition: transform 0.65s;
+    }
+
+    .submit-btn:hover {
+      background-position: 100% 50%;
+      box-shadow: 0 6px 36px rgba(79,108,255,0.5);
+      transform: translateY(-2px);
+    }
+
+    .submit-btn:hover::before {
+      transform: translateX(110%);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 12px rgba(79,108,255,0.3);
+    }
+
+    .submit-btn.loading {
+      pointer-events: none;
+      opacity: 0.75;
+    }
+
+    .btn-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+    }
+
+    .btn-inner svg.arrow-icon {
+      width: 18px; height: 18px;
+      stroke: #fff; fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.3s;
+    }
+
+    .submit-btn:hover .btn-inner svg.arrow-icon {
+      transform: translateX(3px);
+    }
+
+    .spinner {
+      display: none;
+      width: 20px; height: 20px;
+      border: 2.5px solid rgba(255,255,255,0.25);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.55s linear infinite;
+    }
+
+    .submit-btn.loading .spinner { display: block; }
+    .submit-btn.loading .btn-label,
+    .submit-btn.loading .arrow-icon { display: none; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #msg {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      min-height: 22px;
+      transition: all 0.35s;
+      line-height: 1.5;
+    }
+
+    #msg.error { color: #fca5a5; }
+
+    .board-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      margin-top: 5px;
+      padding-left: 2px;
+      transition: opacity 0.3s;
+    }
+
+    @media (max-width: 480px) {
+      .glass-card {
+        padding: 30px 22px 26px;
+        border-radius: 22px;
+      }
+      .row { grid-template-columns: 1fr; gap: 0; }
+      .form-header h2 { font-size: 21px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .blob, .particle, .header-icon { animation: none !important; }
+      .glass-card, .field, .divider, .submit-btn {
+        animation: none !important;
+        opacity: 1 !important;
+        transform: none !important;
+      }
+      .submit-btn:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-canvas">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="blob blob-5"></div>
+  </div>
+  <div class="grid-overlay"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="glass-card">
+
+    <div class="form-header">
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
+      <h2>Registration</h2>
+      <p>Complete the form below to enroll</p>
+    </div>
+
+    <form id="regForm" onsubmit="return false;">
+
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <div class="field-wrap">
+          <input type="text" id="name" placeholder="Enter your name" required>
+          <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">School Name</label>
+        <div class="field-wrap">
+          <input type="text" id="school" placeholder="Your school" required>
+          <svg class="ico" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="field-label">Mobile</label>
+          <div class="field-wrap">
+            <input type="text" id="mobile" placeholder="01XXXXXXXXX" required>
+            <svg class="ico" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Email</label>
+          <div class="field-wrap">
+            <input type="email" id="email" placeholder="you@email.com" required>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="field-label">Board</label>
+          <div class="field-wrap">
+            <select id="board" onchange="loadDistricts()" required>
+              <option value="">Select Board</option>
+              <option value="dhaka">Dhaka</option>
+              <option value="rajshahi">Rajshahi</option>
+              <option value="chittagong">Chittagong</option>
+              <option value="jashore">Jashore</option>
+              <option value="sylhet">Sylhet</option>
+              <option value="barisal">Barisal</option>
+              <option value="dinajpur">Dinajpur</option>
+              <option value="comilla">Comilla</option>
+              <option value="mymensingh">Mymensingh</option>
+            </select>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
+          </div>
+          <div class="board-hint" id="boardHint"></div>
+        </div>
+        <div class="field">
+          <label class="field-label">District</label>
+          <div class="field-wrap">
+            <select id="district" disabled required>
+              <option value="">Select District</option>
+            </select>
+            <svg class="ico" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider">
+        <span>Payment Information</span>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="field-label">Payment Number</label>
+          <div class="field-wrap">
+            <input type="text" id="paymentNumber" placeholder="Sender number" required>
+            <svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Transaction ID</label>
+          <div class="field-wrap">
+            <input type="text" id="transactionId" placeholder="TxID" required>
+            <svg class="ico" viewBox="0 0 24 24"><polyline points="14 2 14 8 20 8"/><path d="M12 22H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l7 7v11a2 2 0 0 1-2 2z"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
+        <span class="btn-inner">
+          <span class="btn-label">Complete Registration</span>
+          <svg class="arrow-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          <span class="spinner"></span>
+        </span>
+      </button>
+    </form>
+
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    /* ── Particles ── */
+    (function() {
+      const box = document.getElementById('particles');
+      for (let i = 0; i < 28; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.animationDuration = (9 + Math.random() * 18) + 's';
+        p.style.animationDelay = -(Math.random() * 22) + 's';
+        const s = 1.5 + Math.random() * 2.5;
+        p.style.width = p.style.height = s + 'px';
+        p.style.opacity = 0.12 + Math.random() * 0.28;
+        box.appendChild(p);
+      }
+    })();
+
+    /* ── Board → District Data ── */
+    const districtsData = {
+      dhaka: ["Dhaka", "Gazipur", "Narayanganj", "Tangail", "Manikganj", "Munshiganj", "Narsingdi", "Kishoreganj", "Faridpur", "Rajbari", "Madaripur", "Gopalganj", "Shariatpur"],
+      rajshahi: ["Rajshahi", "Bogura", "Pabna", "Sirajganj", "Natore", "Naogaon", "Joypurhat", "Chapainawabganj"],
+      chittagong: ["Chattogram", "Cox's Bazar", "Rangamati", "Bandarban", "Khagrachari", "Comilla", "Feni", "Noakhali", "Lakshmipur", "Chandpur", "Brahmanbaria"],
+      jashore: ["Jashore", "Khulna", "Satkhira", "Bagerhat", "Narail", "Magura", "Jhenaidah", "Kushtia", "Chuadanga", "Meherpur"],
+      sylhet: ["Sylhet", "Moulvibazar", "Habiganj", "Sunamganj"],
+      barisal: ["Barisal", "Bhola", "Patuakhali", "Pirojpur", "Jhalokathi", "Barguna"],
+      dinajpur: ["Dinajpur", "Rangpur", "Thakurgaon", "Panchagarh", "Nilphamari", "Kurigram", "Lalmonirhat", "Gaibandha"],
+      comilla: ["Comilla", "Brahmanbaria", "Chandpur"],
+      mymensingh: ["Mymensingh", "Jamalpur", "Netrokona", "Sherpur"]
+    };
+
+    /* ── Load Districts ── */
+    function loadDistricts() {
+      const board = document.getElementById('board').value;
+      const distSelect = document.getElementById('district');
+      const hint = document.getElementById('boardHint');
+
+      distSelect.innerHTML = '<option value="">Select District</option>';
+
+      if (board && districtsData[board]) {
+        distSelect.disabled = false;
+        const list = districtsData[board];
+        list.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = d;
+          distSelect.appendChild(opt);
+        });
+        hint.textContent = list.length + ' districts available';
       } else {
-        document.getElementById("msg").innerText = "❌ Failed: " + (result.message || "Error");
+        distSelect.disabled = true;
+        hint.textContent = '';
+      }
+    }
+
+    /* ── Submit ── */
+    const API_URL = "https://script.google.com/macros/s/AKfycbwWDI71JyTGjXkwWd7LFbG1MzJKqlb48oJ-2nVb97Eq8U80bAka5BvqTZKs4aMHecQ9ZQ/exec";
+    const submitBtn = document.getElementById('submitBtn');
+    const msgEl = document.getElementById('msg');
+
+    function submitForm() {
+      const ids = ['name', 'school', 'mobile', 'email', 'board', 'district', 'paymentNumber', 'transactionId'];
+      const data = {};
+      let empty = false;
+
+      ids.forEach(id => {
+        data[id] = document.getElementById(id).value.trim();
+        if (!data[id]) empty = true;
+      });
+
+      if (empty) {
+        msgEl.className = 'error';
+        msgEl.textContent = '⚠ Please fill in all fields';
+        shakeCard();
+        return;
       }
 
-    } catch (e) {
-      document.getElementById("msg").innerText = "Server Response Error";
-    }
-  })
-  .catch(err => {
-    document.getElementById("msg").innerText = "Network Error";
-    console.log(err);
-  });
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+        msgEl.className = 'error';
+        msgEl.textContent = '⚠ Enter a valid email address';
+        shakeCard();
+        return;
+      }
 
-}
-</script>
+      submitBtn.classList.add('loading');
+      msgEl.className = '';
+      msgEl.textContent = '';
+
+      fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.status === "success") {
+          window.location.href = "success.html";
+        } else {
+          window.location.href = "fail.html";
+        }
+      })
+      .catch(err => {
+        window.location.href = "fail.html";
+      });
+    }
+
+    function shakeCard() {
+      const card = document.querySelector('.glass-card');
+      card.style.animation = 'none';
+      card.offsetHeight;
+      card.style.animation = 'shake 0.45s ease';
+    }
+
+    const s = document.createElement('style');
+    s.textContent = `@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-5px)}30%{transform:translateX(4px)}45%{transform:translateX(-3px)}60%{transform:translateX(2px)}75%{transform:translateX(-1px)}}`;
+    document.head.appendChild(s);
+
+    document.getElementById('regForm').addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submitForm(); }
+    });
+  </script>
 
 </body>
 </html>
