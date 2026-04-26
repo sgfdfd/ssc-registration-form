@@ -1,872 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <title>Registration</title>
+  <title>Registration Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #070b1e;
-      overflow-x: hidden;
-      padding: 24px 16px;
-      position: relative;
-    }
-
-    .bg-canvas { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
-
-    .blob {
-      position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5;
-      animation: blobFloat 20s ease-in-out infinite; transition: background 1.2s ease;
-    }
-    .blob-1 { width: 520px; height: 520px; top: -12%; left: -8%; animation-duration: 24s; }
-    .blob-2 { width: 440px; height: 440px; bottom: -12%; right: -6%; animation-delay: -6s; animation-duration: 20s; }
-    .blob-3 { width: 380px; height: 380px; top: 45%; left: 55%; animation-delay: -12s; animation-duration: 26s; }
-    .blob-4 { width: 260px; height: 260px; top: 15%; right: 18%; animation-delay: -4s; animation-duration: 22s; }
-    .blob-5 { width: 220px; height: 220px; bottom: 18%; left: 12%; animation-delay: -9s; animation-duration: 28s; }
-
-    body.view-form .blob-1 { background: radial-gradient(circle, #4f6cff, #7c3aed); }
-    body.view-form .blob-2 { background: radial-gradient(circle, #c084fc, #f472b6); }
-    body.view-form .blob-3 { background: radial-gradient(circle, #38bdf8, #3b82f6); }
-    body.view-form .blob-4 { background: radial-gradient(circle, #34d399, #06b6d4); }
-    body.view-form .blob-5 { background: radial-gradient(circle, #fb923c, #f43f5e); }
-
-    body.view-success .blob-1 { background: radial-gradient(circle, #34d399, #059669); }
-    body.view-success .blob-2 { background: radial-gradient(circle, #6ee7b7, #10b981); }
-    body.view-success .blob-3 { background: radial-gradient(circle, #4f6cff, #7c3aed); }
-    body.view-success .blob-4 { background: radial-gradient(circle, #a7f3d0, #06b6d4); }
-    body.view-success .blob-5 { background: radial-gradient(circle, #34d399, #4f6cff); }
-
-    body.view-fail .blob-1 { background: radial-gradient(circle, #f87171, #dc2626); }
-    body.view-fail .blob-2 { background: radial-gradient(circle, #fca5a5, #ef4444); }
-    body.view-fail .blob-3 { background: radial-gradient(circle, #4f6cff, #7c3aed); }
-    body.view-fail .blob-4 { background: radial-gradient(circle, #fb923c, #f43f5e); }
-    body.view-fail .blob-5 { background: radial-gradient(circle, #dc2626, #7c3aed); }
-
-    @keyframes blobFloat {
-      0%, 100% { transform: translate(0, 0) scale(1); }
-      25% { transform: translate(50px, -35px) scale(1.08); }
-      50% { transform: translate(-25px, 55px) scale(0.94); }
-      75% { transform: translate(35px, 25px) scale(1.05); }
-    }
-
-    .grid-overlay {
-      position: fixed; inset: 0; z-index: 1; pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-      background-size: 64px 64px;
-    }
-
-    .particles { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
-    .particle {
-      position: absolute; background: rgba(255,255,255,0.25); border-radius: 50%;
-      animation: drift linear infinite;
-    }
-    @keyframes drift {
-      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
-      8% { opacity: 1; } 92% { opacity: 1; }
-      100% { transform: translateY(-8vh) translateX(25px); opacity: 0; }
-    }
-
-    .glass-card {
-      position: relative; z-index: 10; width: 460px; max-width: 100%;
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(44px); -webkit-backdrop-filter: blur(44px);
-      border: 1px solid rgba(255,255,255,0.1); border-radius: 28px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.15);
-      animation: cardIn 0.9s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(50px) scale(0.95); filter: blur(12px); }
-      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-    }
-
-    .view { display: none; }
-    .view.active { display: block; }
-
-    /* ═══ FORM ═══ */
-    .view-form .glass-card { max-height: 92vh; overflow-y: auto; padding: 40px 34px 34px; }
-    .view-form .glass-card::-webkit-scrollbar { width: 3px; }
-    .view-form .glass-card::-webkit-scrollbar-track { background: transparent; }
-    .view-form .glass-card::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
-
-    .form-header { text-align: center; margin-bottom: 30px; }
-    .header-icon {
-      width: 56px; height: 56px; border-radius: 18px;
-      background: linear-gradient(135deg, #4f6cff, #7c3aed);
-      display: inline-flex; align-items: center; justify-content: center;
-      margin-bottom: 18px; box-shadow: 0 6px 24px rgba(79,108,255,0.45);
-      animation: iconPulse 3s ease-in-out infinite;
-    }
-    @keyframes iconPulse {
-      0%, 100% { box-shadow: 0 6px 24px rgba(79,108,255,0.45); }
-      50% { box-shadow: 0 6px 36px rgba(79,108,255,0.65); }
-    }
-    .header-icon svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .form-header h2 { color: #fff; font-size: 24px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 5px; }
-    .form-header p { color: rgba(255,255,255,0.4); font-size: 13px; font-weight: 400; }
-
-    .field { margin-bottom: 16px; animation: fieldIn 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-    .field:nth-child(1) { animation-delay: 0.08s; } .field:nth-child(2) { animation-delay: 0.13s; }
-    .field:nth-child(3) { animation-delay: 0.18s; } .field:nth-child(4) { animation-delay: 0.23s; }
-    .field:nth-child(5) { animation-delay: 0.28s; } .field:nth-child(6) { animation-delay: 0.33s; }
-    .field:nth-child(7) { animation-delay: 0.38s; } .field:nth-child(8) { animation-delay: 0.43s; }
-    .field:nth-child(9) { animation-delay: 0.48s; } .field:nth-child(10) { animation-delay: 0.53s; }
-    .field:nth-child(11) { animation-delay: 0.58s; }
-    @keyframes fieldIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
-
-    .field-label { display: block; color: rgba(255,255,255,0.45); font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 7px; }
-    .field-wrap { position: relative; }
-    .field-wrap .ico {
-      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-      width: 17px; height: 17px; stroke: rgba(255,255,255,0.22); fill: none;
-      stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
-      pointer-events: none; transition: stroke 0.3s; z-index: 2;
-    }
-
-    input, select {
-      width: 100%; padding: 12px 14px 12px 44px;
-      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 12px; color: #fff; font-family: 'Inter', sans-serif;
-      font-size: 13.5px; font-weight: 400; outline: none;
-      transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      -webkit-appearance: none; appearance: none;
-    }
-    select {
-      cursor: pointer; padding-right: 38px;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='rgba(255,255,255,0.25)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m2 4 5 5 5-5'/%3E%3C/svg%3E");
-      background-repeat: no-repeat; background-position: right 13px center;
-    }
-    input::placeholder { color: rgba(255,255,255,0.18); }
-    select option { background: #151a3a; color: #fff; }
-    input:hover, select:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
-    input:focus, select:focus { background: rgba(255,255,255,0.08); border-color: rgba(79,108,255,0.5); box-shadow: 0 0 0 3px rgba(79,108,255,0.1), 0 0 24px rgba(79,108,255,0.06); }
-    input:focus ~ .ico, select:focus ~ .ico { stroke: rgba(99,140,255,0.7); }
-
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .divider {
-      display: flex; align-items: center; gap: 14px; margin: 22px 0 18px;
-      animation: fieldIn 0.6s 0.4s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
-    .divider span { color: rgba(255,255,255,0.25); font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; white-space: nowrap; }
-    select:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .submit-btn {
-      width: 100%; padding: 14px 24px;
-      background: linear-gradient(135deg, #4f6cff 0%, #7c3aed 50%, #a855f7 100%);
-      background-size: 200% 200%; color: #fff; border: none; border-radius: 14px;
-      font-family: 'Inter', sans-serif; font-size: 14.5px; font-weight: 600;
-      letter-spacing: 0.015em; cursor: pointer; position: relative; overflow: hidden;
-      margin-top: 6px; transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 0 4px 24px rgba(79,108,255,0.35);
-      animation: fieldIn 0.6s 0.6s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    .submit-btn::before {
-      content: ''; position: absolute; inset: 0;
-      background: linear-gradient(135deg, transparent, rgba(255,255,255,0.18), transparent);
-      transform: translateX(-110%); transition: transform 0.65s;
-    }
-    .submit-btn:hover { background-position: 100% 50%; box-shadow: 0 6px 36px rgba(79,108,255,0.5); transform: translateY(-2px); }
-    .submit-btn:hover::before { transform: translateX(110%); }
-    .submit-btn:active { transform: translateY(0); box-shadow: 0 2px 12px rgba(79,108,255,0.3); }
-    .submit-btn.loading { pointer-events: none; opacity: 0.75; }
-
-    .btn-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 9px; }
-    .btn-inner svg.arrow-icon { width: 18px; height: 18px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s; }
-    .submit-btn:hover .btn-inner svg.arrow-icon { transform: translateX(3px); }
-
-    .spinner { display: none; width: 20px; height: 20px; border: 2.5px solid rgba(255,255,255,0.25); border-top-color: #fff; border-radius: 50%; animation: spin 0.55s linear infinite; }
-    .submit-btn.loading .spinner { display: block; }
-    .submit-btn.loading .btn-label, .submit-btn.loading .arrow-icon { display: none; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    #msg { margin-top: 14px; text-align: center; font-size: 13px; font-weight: 500; min-height: 22px; transition: all 0.35s; line-height: 1.5; }
-    #msg.error { color: #fca5a5; }
-    .board-hint { font-size: 11px; color: rgba(255,255,255,0.25); margin-top: 5px; padding-left: 2px; transition: opacity 0.3s; }
-
-    /* ═══ SUCCESS ═══ */
-    .view-success .glass-card { padding: 48px 36px 40px; text-align: center; }
-    .success-icon-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 28px; }
-    .success-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(52,211,153,0.2); animation: ringPulse 2.5s ease-in-out infinite; }
-    .success-ring-2 { position: absolute; inset: -12px; border-radius: 50%; border: 1px solid rgba(52,211,153,0.08); animation: ringPulse 2.5s ease-in-out 0.4s infinite; }
-    @keyframes ringPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.08); opacity: 0.5; } }
-    .success-icon {
-      position: absolute; inset: 0; border-radius: 50%;
-      background: linear-gradient(135deg, #34d399, #059669);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 30px rgba(52,211,153,0.4);
-      animation: iconBounceIn 0.7s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    @keyframes iconBounceIn { from { transform: scale(0); } to { transform: scale(1); } }
-    .success-icon svg { width: 44px; height: 44px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 50; stroke-dashoffset: 50; animation: drawCheck 0.5s 0.7s ease forwards; }
-    @keyframes drawCheck { to { stroke-dashoffset: 0; } }
-    .success-title { color: #fff; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; animation: textIn 0.6s 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-    .success-title .emoji { display: inline-block; animation: emojiPop 0.5s 0.9s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes emojiPop { from { transform: scale(0) rotate(-20deg); } to { transform: scale(1) rotate(0deg); } }
-    .success-sub { color: rgba(255,255,255,0.45); font-size: 14.5px; font-weight: 400; line-height: 1.7; margin-bottom: 6px; animation: textIn 0.6s 0.75s cubic-bezier(0.16,1,0.3,1) both; }
-    .success-bn { color: rgba(255,255,255,0.6); font-size: 15px; font-weight: 500; line-height: 1.7; margin-bottom: 32px; animation: textIn 0.6s 0.85s cubic-bezier(0.16,1,0.3,1) both; }
-    @keyframes textIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-    .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; animation: textIn 0.6s 0.95s cubic-bezier(0.16,1,0.3,1) both; }
-    .info-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 16px 14px; text-align: center; }
-    .info-card .info-emoji { font-size: 22px; margin-bottom: 8px; display: block; }
-    .info-card .info-label { color: rgba(255,255,255,0.3); font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
-    .info-card .info-value { color: rgba(255,255,255,0.75); font-size: 13px; font-weight: 500; }
-
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 8px; padding: 13px 32px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
-      color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
-      text-decoration: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      animation: textIn 0.6s 1.05s cubic-bezier(0.16,1,0.3,1) both;
-    }
-    .back-btn svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: all 0.3s; }
-    .back-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.16); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-    .back-btn:hover svg { stroke: #fff; transform: translateX(-3px); }
-    .back-btn:active { transform: translateY(0); }
-    .footer-note { color: rgba(255,255,255,0.2); font-size: 11.5px; margin-top: 20px; animation: textIn 0.6s 1.15s cubic-bezier(0.16,1,0.3,1) both; }
-
-    /* ═══ FAIL ═══ */
-    .view-fail .glass-card { padding: 48px 36px 40px; text-align: center; }
-    .error-icon-wrap { position: relative; width: 100px; height: 100px; margin: 0 auto 28px; animation: shakeOnce 0.5s 1.2s ease both; }
-    .error-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(248,113,113,0.2); animation: ringPulse 2.5s ease-in-out infinite; }
-    .error-ring-2 { position: absolute; inset: -12px; border-radius: 50%; border: 1px solid rgba(248,113,113,0.08); animation: ringPulse 2.5s ease-in-out 0.4s infinite; }
-    .error-icon {
-      position: absolute; inset: 0; border-radius: 50%;
-      background: linear-gradient(135deg, #f87171, #dc2626);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 6px 30px rgba(248,113,113,0.4);
-      animation: iconBounceInFail 0.7s 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    @keyframes iconBounceInFail { from { transform: scale(0) rotate(-10deg); } to { transform: scale(1) rotate(0deg); } }
-    .error-icon svg { width: 44px; height: 44px; stroke: #fff; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 60; stroke-dashoffset: 60; animation: drawX 0.5s 0.7s ease forwards; }
-    @keyframes drawX { to { stroke-dashoffset: 0; } }
-    @keyframes shakeOnce {
-      0%, 100% { transform: translateX(0); } 15% { transform: translateX(-6px) rotate(-2deg); }
-      30% { transform: translateX(5px) rotate(2deg); } 45% { transform: translateX(-4px) rotate(-1deg); }
-      60% { transform: translateX(3px) rotate(1deg); } 75% { transform: translateX(-2px); }
-      90% { transform: translateX(1px); }
-    }
-    .error-title { color: #fff; font-size: 26px; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 8px; animation: textIn 0.6s 0.6s cubic-bezier(0.16,1,0.3,1) both; }
-    .error-title .emoji { display: inline-block; animation: emojiPopFail 0.5s 0.9s cubic-bezier(0.34,1.56,0.64,1) both; }
-    @keyframes emojiPopFail { from { transform: scale(0) rotate(20deg); } to { transform: scale(1) rotate(0deg); } }
-    .error-sub { color: rgba(255,255,255,0.45); font-size: 14.5px; font-weight: 400; line-height: 1.7; margin-bottom: 6px; animation: textIn 0.6s 0.75s cubic-bezier(0.16,1,0.3,1) both; }
-    .error-bn { color: rgba(255,255,255,0.6); font-size: 15px; font-weight: 500; line-height: 1.7; margin-bottom: 32px; animation: textIn 0.6s 0.85s cubic-bezier(0.16,1,0.3,1) both; }
-    .info-card.error-card { background: rgba(248,113,113,0.06); border-color: rgba(248,113,113,0.1); }
-    .info-card.error-card .info-value { color: #fca5a5; }
-
-    .btn-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; animation: textIn 0.6s 1.05s cubic-bezier(0.16,1,0.3,1) both; }
-    .retry-btn {
-      display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px;
-      background: linear-gradient(135deg, #f87171, #dc2626); border: none; border-radius: 14px;
-      color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
-      text-decoration: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 0 4px 20px rgba(248,113,113,0.3); position: relative; overflow: hidden;
-    }
-    .retry-btn::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent, rgba(255,255,255,0.18), transparent); transform: translateX(-110%); transition: transform 0.6s; }
-    .retry-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(248,113,113,0.45); }
-    .retry-btn:hover::before { transform: translateX(110%); }
-    .retry-btn:active { transform: translateY(0); }
-    .retry-btn svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform 0.3s; }
-    .retry-btn:hover svg { transform: rotate(180deg); }
-    .home-btn {
-      display: inline-flex; align-items: center; gap: 8px; padding: 13px 28px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px;
-      color: #fff; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500;
-      text-decoration: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
-    }
-    .home-btn svg { width: 16px; height: 16px; stroke: rgba(255,255,255,0.5); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: all 0.3s; }
-    .home-btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.16); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
-    .home-btn:hover svg { stroke: #fff; transform: translateX(-3px); }
-    .home-btn:active { transform: translateY(0); }
-
-    .confetti-container { position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden; }
-    .confetti { position: absolute; width: 8px; height: 8px; top: -10px; animation: confettiFall linear forwards; }
-    @keyframes confettiFall {
-      0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-      80% { opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg) scale(0.5); opacity: 0; }
-    }
-    .error-particles { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
-    .error-spark { position: absolute; width: 2px; height: 2px; background: rgba(248,113,113,0.6); border-radius: 50%; animation: sparkFade 2s ease-out forwards; }
-    @keyframes sparkFade { 0% { transform: scale(0); opacity: 1; } 50% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(0); opacity: 0; } }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); } 15% { transform: translateX(-5px); }
-      30% { transform: translateX(4px); } 45% { transform: translateX(-3px); }
-      60% { transform: translateX(2px); } 75% { transform: translateX(-1px); }
-    }
-
-    @media (max-width: 480px) {
-      .view-form .glass-card { padding: 30px 22px 26px; border-radius: 22px; }
-      .view-success .glass-card, .view-fail .glass-card { padding: 36px 24px 32px; border-radius: 22px; }
-      .row { grid-template-columns: 1fr; gap: 0; }
-      .form-header h2, .success-title, .error-title { font-size: 22px; }
-      .info-row { grid-template-columns: 1fr; }
-      .btn-row { flex-direction: column; }
-      .retry-btn, .home-btn { justify-content: center; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .blob, .particle, .success-ring, .success-ring-2, .error-ring, .error-ring-2, .header-icon { animation: none !important; }
-      .glass-card, .field, .divider, .submit-btn, .success-icon, .success-title, .success-sub, .success-bn,
-      .info-row, .back-btn, .footer-note, .success-title .emoji, .error-title, .error-sub, .error-bn,
-      .btn-row, .error-title .emoji, .error-icon-wrap { animation: none !important; opacity: 1 !important; transform: none !important; }
-      .success-icon svg, .error-icon svg { stroke-dashoffset: 0 !important; }
-      .submit-btn:hover, .back-btn:hover, .retry-btn:hover, .home-btn:hover { transform: none; }
-      .confetti, .error-spark { display: none !important; }
-    }
-  </style>
 </head>
-<body class="view-form">
 
-  <div class="bg-canvas">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-    <div class="blob blob-4"></div>
-    <div class="blob blob-5"></div>
-  </div>
-  <div class="grid-overlay"></div>
-  <div class="particles" id="particles"></div>
-  <div class="confetti-container" id="confetti"></div>
-  <div class="error-particles" id="errorParticles"></div>
+<body style="font-family: Arial; padding:20px;">
 
-  <!-- ═══ FORM VIEW ═══ -->
-  <div class="view active" id="viewForm">
-    <div class="glass-card" id="formCard">
-      <div class="form-header">
-        <div class="header-icon">
-          <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <h2>Registration</h2>
-        <p>Complete the form below to enroll</p>
-      </div>
-      <form id="regForm" onsubmit="return false;">
-        <div class="field">
-          <label class="field-label">Full Name</label>
-          <div class="field-wrap">
-            <input type="text" id="name" placeholder="Enter your name" required>
-            <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          </div>
-        </div>
-        <div class="field">
-          <label class="field-label">School Name</label>
-          <div class="field-wrap">
-            <input type="text" id="school" placeholder="Your school" required>
-            <svg class="ico" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label class="field-label">Mobile</label>
-            <div class="field-wrap">
-              <input type="text" id="mobile" placeholder="01XXXXXXXXX" required>
-              <svg class="ico" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-            </div>
-          </div>
-          <div class="field">
-            <label class="field-label">Email</label>
-            <div class="field-wrap">
-              <input type="email" id="email" placeholder="you@email.com" required>
-              <svg class="ico" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label class="field-label">Board</label>
-            <div class="field-wrap">
-              <select id="board" required>
-                <option value="">Select Board</option>
-                <option value="dhaka">Dhaka</option>
-                <option value="rajshahi">Rajshahi</option>
-                <option value="chittagong">Chittagong</option>
-                <option value="jashore">Jashore</option>
-                <option value="sylhet">Sylhet</option>
-                <option value="barisal">Barisal</option>
-                <option value="dinajpur">Dinajpur</option>
-                <option value="comilla">Comilla</option>
-                <option value="mymensingh">Mymensingh</option>
-              </select>
-              <svg class="ico" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/></svg>
-            </div>
-            <div class="board-hint" id="boardHint"></div>
-          </div>
-          <div class="field">
-            <label class="field-label">District</label>
-            <div class="field-wrap">
-              <select id="district" disabled required>
-                <option value="">Select District</option>
-              </select>
-              <svg class="ico" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            </div>
-          </div>
-        </div>
-        <div class="divider"><span>Payment Information</span></div>
-        <div class="row">
-          <div class="field">
-            <label class="field-label">Payment Number</label>
-            <div class="field-wrap">
-              <input type="text" id="paymentNumber" placeholder="Sender number" required>
-              <svg class="ico" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-            </div>
-          </div>
-          <div class="field">
-            <label class="field-label">Transaction ID</label>
-            <div class="field-wrap">
-              <input type="text" id="transactionId" placeholder="TxID" required>
-              <svg class="ico" viewBox="0 0 24 24"><polyline points="14 2 14 8 20 8"/><path d="M12 22H5a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l7 7v11a2 2 0 0 1-2 2z"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-            </div>
-          </div>
-        </div>
-        <button type="button" class="submit-btn" id="submitBtn">
-          <span class="btn-inner">
-            <span class="btn-label">Complete Registration</span>
-            <svg class="arrow-icon" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-            <span class="spinner"></span>
-          </span>
-        </button>
-      </form>
-      <p id="msg"></p>
-    </div>
-  </div>
+<h2>Registration Form</h2>
 
-  <!-- ═══ SUCCESS VIEW ═══ -->
-  <div class="view" id="viewSuccess">
-    <div class="glass-card">
-      <div class="success-icon-wrap">
-        <div class="success-ring"></div>
-        <div class="success-ring-2"></div>
-        <div class="success-icon">
-          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-      </div>
-      <h1 class="success-title"><span class="emoji">🎉</span> অভিনন্দন!</h1>
-      <p class="success-sub">Your registration has been completed successfully.</p>
-      <p class="success-bn">আপনার রেজিস্ট্রেশন সফল হয়েছে।</p>
-      <div class="info-row">
-        <div class="info-card">
-          <span class="info-emoji">✅</span>
-          <div class="info-label">Status</div>
-          <div class="info-value">Confirmed</div>
-        </div>
-        <div class="info-card">
-          <span class="info-emoji">📧</span>
-          <div class="info-label">Next Step</div>
-          <div class="info-value">Check Email</div>
-        </div>
-      </div>
-      <a href="#" class="back-btn" id="successBackBtn">
-        <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Back to Home
-      </a>
-      <p class="footer-note">You may close this tab now.</p>
-    </div>
-  </div>
+<form id="regForm">
 
-  <!-- ═══ FAIL VIEW ═══ -->
-  <div class="view" id="viewFail">
-    <div class="glass-card">
-      <div class="error-icon-wrap">
-        <div class="error-ring"></div>
-        <div class="error-ring-2"></div>
-        <div class="error-icon">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        </div>
-      </div>
-      <h1 class="error-title"><span class="emoji">😞</span> দুঃখিত!</h1>
-      <p class="error-sub">Something went wrong. Your registration could not be completed.</p>
-      <p class="error-bn">আপনার রেজিস্ট্রেশন ব্যর্থ হয়েছে। আবার চেষ্টা করুন।</p>
-      <div class="info-row">
-        <div class="info-card error-card">
-          <span class="info-emoji">⚠️</span>
-          <div class="info-label">Status</div>
-          <div class="info-value">Failed</div>
-        </div>
-        <div class="info-card">
-          <span class="info-emoji">💡</span>
-          <div class="info-label">Suggestion</div>
-          <div class="info-value">Try Again</div>
-        </div>
-      </div>
-      <div class="btn-row">
-        <a href="#" class="retry-btn" id="failRetryBtn">
-          <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-          Try Again
-        </a>
-        <a href="#" class="home-btn" id="failHomeBtn">
-          <svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-          Back to Home
-        </a>
-      </div>
-      <p class="footer-note">If the problem persists, contact support.</p>
-    </div>
-  </div>
+  <input id="name" placeholder="Full Name" required><br><br>
+  <input id="school" placeholder="School Name" required><br><br>
+  <input id="mobile" placeholder="Mobile (01XXXXXXXXX)" required><br><br>
+  <input id="email" placeholder="Email" required><br><br>
 
-  <script>
-    /* ══════════════════════════════════════
-       DOM References (all declared upfront)
-       ══════════════════════════════════════ */
-    var submitBtn      = document.getElementById('submitBtn');
-    var msgEl           = document.getElementById('msg');
-    var boardSelect     = document.getElementById('board');
-    var districtSelect  = document.getElementById('district');
-    var boardHint       = document.getElementById('boardHint');
-    var regForm         = document.getElementById('regForm');
-    var formCard        = document.getElementById('formCard');
-    var confettiBox     = document.getElementById('confetti');
-    var errorPartBox    = document.getElementById('errorParticles');
+  <select id="board" required>
+    <option value="">Select Board</option>
+    <option value="dhaka">Dhaka</option>
+    <option value="rajshahi">Rajshahi</option>
+  </select><br><br>
 
-    /* ══════════════════════════════════════
-       State
-       ══════════════════════════════════════ */
-    var isSubmitting  = false;
-    var sparkInterval = null;
-    var API_URL = 'https://script.google.com/macros/s/AKfycbwWDI71JyTGjXkwWd7LFbG1MzJKqlb48oJ-2nVb97Eq8U80bAka5BvqTZKs4aMHecQ9ZQ/exec';
+  <input id="district" placeholder="District" required><br><br>
 
-    /* ══════════════════════════════════════
-       District Data
-       ══════════════════════════════════════ */
-    var districtsData = {
-      dhaka:      ['Dhaka','Gazipur','Narayanganj','Tangail','Manikganj','Munshiganj','Narsingdi','Kishoreganj','Faridpur','Rajbari','Madaripur','Gopalganj','Shariatpur'],
-      rajshahi:   ['Rajshahi','Bogura','Pabna','Sirajganj','Natore','Naogaon','Joypurhat','Chapainawabganj'],
-      chittagong: ['Chattogram',"Cox's Bazar",'Rangamati','Bandarban','Khagrachari','Comilla','Feni','Noakhali','Lakshmipur','Chandpur','Brahmanbaria'],
-      jashore:    ['Jashore','Khulna','Satkhira','Bagerhat','Narail','Magura','Jhenaidah','Kushtia','Chuadanga','Meherpur'],
-      sylhet:     ['Sylhet','Moulvibazar','Habiganj','Sunamganj'],
-      barisal:    ['Barisal','Bhola','Patuakhali','Pirojpur','Jhalokathi','Barguna'],
-      dinajpur:   ['Dinajpur','Rangpur','Thakurgaon','Panchagarh','Nilphamari','Kurigram','Lalmonirhat','Gaibandha'],
-      comilla:    ['Comilla','Brahmanbaria','Chandpur'],
-      mymensingh: ['Mymensingh','Jamalpur','Netrokona','Sherpur']
-    };
+  <input id="paymentNumber" placeholder="Payment Number" required><br><br>
+  <input id="transactionId" placeholder="Transaction ID" required><br><br>
 
-    /* ══════════════════════════════════════
-       Background Particles (run once)
-       ══════════════════════════════════════ */
-    (function initParticles() {
-      var box = document.getElementById('particles');
-      for (var i = 0; i < 28; i++) {
-        var p = document.createElement('div');
-        p.className = 'particle';
-        p.style.left = Math.random() * 100 + '%';
-        p.style.animationDuration = (9 + Math.random() * 18) + 's';
-        p.style.animationDelay = -(Math.random() * 22) + 's';
-        var s = 1.5 + Math.random() * 2.5;
-        p.style.width = p.style.height = s + 'px';
-        p.style.opacity = 0.12 + Math.random() * 0.28;
-        box.appendChild(p);
-      }
-    })();
+  <button type="button" onclick="submitForm()">Submit</button>
 
-    /* ══════════════════════════════════════
-       View Switching (UI only, no URL change)
-       ══════════════════════════════════════ */
-    function switchView(viewName) {
-      /* Hide all views */
-      var views = document.querySelectorAll('.view');
-      for (var i = 0; i < views.length; i++) {
-        views[i].classList.remove('active');
-      }
+</form>
 
-      /* Cleanup effects from previous view */
-      clearEffects();
+<p id="msg"></p>
 
-      /* Set body class for blob colors */
-      document.body.className = 'view-' + (viewName || 'form');
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbzMPU6thUFOh9BiGo_hLwxzANOqbB4cqxo8RdkrXVjgPum9RHtX6ecG1dCXtX8qRiQTuA/exec";
 
-      if (viewName === 'success') {
-        document.getElementById('viewSuccess').classList.add('active');
-        launchConfetti();
-      } else if (viewName === 'fail') {
-        document.getElementById('viewFail').classList.add('active');
-        startErrorSparks();
+function submitForm() {
+
+  const data = {
+    name: document.getElementById("name").value.trim(),
+    school: document.getElementById("school").value.trim(),
+    mobile: document.getElementById("mobile").value.trim(),
+    email: document.getElementById("email").value.trim(),
+    board: document.getElementById("board").value,
+    district: document.getElementById("district").value.trim(),
+    paymentNumber: document.getElementById("paymentNumber").value.trim(),
+    transactionId: document.getElementById("transactionId").value.trim()
+  };
+
+  // simple validation
+  for (let key in data) {
+    if (!data[key]) {
+      document.getElementById("msg").innerText = "সব ফিল্ড পূরণ করুন";
+      return;
+    }
+  }
+
+  document.getElementById("msg").innerText = "Submitting...";
+
+  fetch(API_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "text/plain;charset=utf-8"
+    },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.text())
+  .then(res => {
+    try {
+      const result = JSON.parse(res);
+
+      if (result.status === "success") {
+        document.getElementById("msg").innerText = "✅ Registration Successful";
+        document.getElementById("regForm").reset();
       } else {
-        /* Default = form */
-        document.getElementById('viewForm').classList.add('active');
-        resetForm();
+        document.getElementById("msg").innerText = "❌ Failed: " + (result.message || "Error");
       }
 
-      /* Retrigger card entry animation */
-      var activeCard = document.querySelector('.view.active .glass-card');
-      if (activeCard) {
-        activeCard.style.animation = 'none';
-        void activeCard.offsetHeight; /* force reflow */
-        activeCard.style.animation = '';
-      }
+    } catch (e) {
+      document.getElementById("msg").innerText = "Server Response Error";
     }
+  })
+  .catch(err => {
+    document.getElementById("msg").innerText = "Network Error";
+    console.log(err);
+  });
 
-    /* Clean up confetti and error sparks */
-    function clearEffects() {
-      if (sparkInterval) {
-        clearInterval(sparkInterval);
-        sparkInterval = null;
-      }
-      confettiBox.innerHTML = '';
-      errorPartBox.innerHTML = '';
-    }
+}
+</script>
 
-    /* Reset form to initial state */
-    function resetForm() {
-      isSubmitting = false;
-      regForm.reset();
-      districtSelect.innerHTML = '<option value="">Select District</option>';
-      districtSelect.disabled = true;
-      boardHint.textContent = '';
-      msgEl.textContent = '';
-      msgEl.className = '';
-      submitBtn.classList.remove('loading');
-    }
-
-    /* ══════════════════════════════════════
-       Hash-based Navigation
-       ══════════════════════════════════════ */
-
-    /* Navigate to a view via hash (triggers hashchange → switchView) */
-    function goTo(viewName) {
-      var target = viewName ? '#' + viewName : '';
-      if (location.hash !== target) {
-        location.hash = target;
-      } else {
-        /* Already at this hash — switchView won't fire from hashchange */
-        switchView(viewName);
-      }
-    }
-
-    /* Go home — clears hash completely */
-    function goHome(e) {
-      if (e) e.preventDefault();
-      if (location.hash === '' || location.hash === '#') {
-        switchView('');
-      } else {
-        location.hash = '';
-      }
-    }
-
-    /* Browser back / forward */
-    window.addEventListener('hashchange', function() {
-      switchView(location.hash.replace('#', ''));
-    });
-
-    /* ══════════════════════════════════════
-       Confetti (success effect)
-       ══════════════════════════════════════ */
-    function launchConfetti() {
-      var colors = ['#34d399','#6ee7b7','#4f6cff','#a855f7','#fbbf24','#f472b6','#38bdf8','#fb923c'];
-      var shapes = ['circle','square','rect'];
-
-      for (var i = 0; i < 60; i++) {
-        var el = document.createElement('div');
-        el.className = 'confetti';
-        var color = colors[Math.floor(Math.random() * colors.length)];
-        var shape = shapes[Math.floor(Math.random() * shapes.length)];
-        el.style.left = (10 + Math.random() * 80) + '%';
-        el.style.animationDuration = (2 + Math.random() * 3) + 's';
-        el.style.animationDelay = (Math.random() * 1.2) + 's';
-        el.style.background = color;
-
-        if (shape === 'circle') {
-          el.style.borderRadius = '50%';
-          var sz = 5 + Math.random() * 7;
-          el.style.width = el.style.height = sz + 'px';
-        } else if (shape === 'square') {
-          var sz2 = 5 + Math.random() * 6;
-          el.style.width = el.style.height = sz2 + 'px';
-          el.style.borderRadius = '2px';
-        } else {
-          el.style.width = (4 + Math.random() * 5) + 'px';
-          el.style.height = (10 + Math.random() * 14) + 'px';
-          el.style.borderRadius = '2px';
-        }
-        confettiBox.appendChild(el);
-      }
-    }
-
-    /* ══════════════════════════════════════
-       Error Sparks (fail effect)
-       ══════════════════════════════════════ */
-    function startErrorSparks() {
-      function createSparks() {
-        var card = document.querySelector('#viewFail .glass-card');
-        if (!card) return;
-        var rect = card.getBoundingClientRect();
-        var cx = rect.left + rect.width / 2;
-        var cy = rect.top + 100;
-
-        for (var i = 0; i < 12; i++) {
-          var spark = document.createElement('div');
-          spark.className = 'error-spark';
-          var angle = (Math.PI * 2 / 12) * i;
-          var dist = 40 + Math.random() * 30;
-          spark.style.left = (cx + Math.cos(angle) * dist) + 'px';
-          spark.style.top = (cy + Math.sin(angle) * dist) + 'px';
-          var sz = 2 + Math.random() * 3;
-          spark.style.width = spark.style.height = sz + 'px';
-          spark.style.animationDuration = (1.5 + Math.random()) + 's';
-          errorPartBox.appendChild(spark);
-          setTimeout((function(el) { return function() { el.remove(); }; })(spark), 2500);
-        }
-      }
-
-      setTimeout(createSparks, 1300);
-      sparkInterval = setInterval(createSparks, 4000);
-    }
-
-    /* ══════════════════════════════════════
-       District Loading
-       ══════════════════════════════════════ */
-    function loadDistricts() {
-      var board = boardSelect.value;
-      districtSelect.innerHTML = '<option value="">Select District</option>';
-
-      if (board && districtsData[board]) {
-        var list = districtsData[board];
-        for (var i = 0; i < list.length; i++) {
-          var opt = document.createElement('option');
-          opt.value = list[i];
-          opt.textContent = list[i];
-          districtSelect.appendChild(opt);
-        }
-        districtSelect.disabled = false;
-        boardHint.textContent = list.length + ' districts available';
-      } else {
-        districtSelect.disabled = true;
-        boardHint.textContent = '';
-      }
-    }
-
-    /* ══════════════════════════════════════
-       Validation
-       ══════════════════════════════════════ */
-    function validateForm(data) {
-      /* Check empty */
-      var fields = ['name','school','mobile','email','board','district','paymentNumber','transactionId'];
-      for (var i = 0; i < fields.length; i++) {
-        if (!data[fields[i]]) {
-          return '⚠ Please fill in all fields';
-        }
-      }
-
-      /* Bangladesh mobile: 01XXXXXXXXX (11 digits, starts 01, second digit 3-9) */
-      if (!/^01[3-9]\d{8}$/.test(data.mobile)) {
-        return '⚠ Enter a valid BD mobile number (01XXXXXXXXX)';
-      }
-
-      /* Email */
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
-        return '⚠ Enter a valid email address';
-      }
-
-      /* Transaction ID: minimum 6 characters */
-      if (data.transactionId.length < 6) {
-        return '⚠ Transaction ID must be at least 6 characters';
-      }
-
-      return null; /* valid */
-    }
-
-    /* ══════════════════════════════════════
-       Form Submission
-       ══════════════════════════════════════ */
-    function submitForm() {
-      /* Prevent double submission */
-      if (isSubmitting) return;
-
-      /* Collect data */
-      var fields = ['name','school','mobile','email','board','district','paymentNumber','transactionId'];
-      var data = {};
-      for (var i = 0; i < fields.length; i++) {
-        data[fields[i]] = document.getElementById(fields[i]).value.trim();
-      }
-
-      /* Validate */
-      var error = validateForm(data);
-      if (error) {
-        msgEl.className = 'error';
-        msgEl.textContent = error;
-        shakeCard();
-        return;
-      }
-
-      /* Start loading */
-      isSubmitting = true;
-      submitBtn.classList.add('loading');
-      msgEl.className = '';
-      msgEl.textContent = '';
-
-      /* Send to Google Apps Script */
-      fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(data),
-        redirect: 'follow'
-      })
-      .then(function(res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        return res.text();
-      })
-      .then(function(text) {
-        var result;
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          throw new Error('Invalid response');
-        }
-        if (result.status === 'success') {
-          goTo('success');
-        } else {
-          goTo('fail');
-        }
-      })
-      .catch(function() {
-        /* Network error, timeout, or parse failure */
-        goTo('fail');
-      })
-      .finally(function() {
-        isSubmitting = false;
-        submitBtn.classList.remove('loading');
-      });
-    }
-
-    /* Shake the form card on validation error */
-    function shakeCard() {
-      formCard.style.animation = 'none';
-      void formCard.offsetHeight;
-      formCard.style.animation = 'shake 0.45s ease';
-    }
-
-    /* ══════════════════════════════════════
-       Event Listeners
-       ══════════════════════════════════════ */
-    submitBtn.addEventListener('click', submitForm);
-    boardSelect.addEventListener('change', loadDistricts);
-    document.getElementById('successBackBtn').addEventListener('click', goHome);
-    document.getElementById('failRetryBtn').addEventListener('click', goHome);
-    document.getElementById('failHomeBtn').addEventListener('click', goHome);
-
-    regForm.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        submitForm();
-      }
-    });
-
-    /* ══════════════════════════════════════
-       Initialization
-       ══════════════════════════════════════ */
-    (function init() {
-      var hash = location.hash.replace('#', '');
-      if (hash === 'success' || hash === 'fail') {
-        switchView(hash);
-      } else {
-        switchView('');
-      }
-    })();
-  </script>
 </body>
 </html>
